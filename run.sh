@@ -1,2 +1,4 @@
 #!/bin/bash
-docker run --name spring-boot-demo -p 8080:8080 -p 9010:9010 spring-boot-demo:latest
+CONTAINER_NAME="spring-demo-app"
+CONTAINER_TAG="latest"
+docker run --name $CONTAINER_NAME -p 8080:8080 -p 9010:9010 $CONTAINER_NAME:$CONTAINER_TAG
