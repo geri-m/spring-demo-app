@@ -1,0 +1,11 @@
+management:
+  endpoints:
+    # See other Actuators https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html
+    web.exposure.include: health,info,metrics,loggers
+    enabled-by-default: true
+
+# We make the host address explicit to localhost host, so that the container must not bind to any other IP, such as 0.0.0.0
+# This will avoid that Spring will accidentally bind against Non-Localhost IP.
+server:
+  port: 8080
+  # address: localhost
