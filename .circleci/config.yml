@@ -1,0 +1,45 @@
+# Java Maven CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/openjdk:8-jdk
+
+    working_directory: ~/repo
+
+    environment:
+      # Customize the JVM maximum heap limit
+      MAVEN_OPTS: -Xmx2048m
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      # Make sure we have all dependencies
+      - run: mvn dependency:go-offline
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "pom.xml" }}
+
+      # run tests!
+      - run:
+          name: Maven Build and Test/JaCoDo (for Code Coverage)
+          # https://stackoverflow.com/questions/53010200/maven-surefire-could-not-find-forkedbooter-class/53012553#53012553
+          command: mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -Dmaven.test.failure.ignore=false
+
+      # run SonarCloud Tests
+      - run:
+          name: Run SonarQube Analyis
+          command: 'mvn sonar:sonar -Dsonar.projectKey=geri-m_spring-boot-demo  -Dsonar.organization=geri-m-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN'
